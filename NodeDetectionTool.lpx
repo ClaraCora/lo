@@ -1,0 +1,11 @@
+#!name=节点检测工具
+#!desc=Loon 节点检测工具：入口落地、地理位置、节点解锁、IP纯净度查询
+#!author=Claw
+#!homepage=https://github.com/ClaraCora/lo
+#!icon=globe.asia.australia.system
+
+[Script]
+generic script-path=https://raw.githubusercontent.com/ClaraCora/lo/main/NetworkEntryAndExitQueries.js, timeout=10, tag=入口落地查询, img-url=globe.asia.australia.system
+generic script-path=https://raw.githubusercontent.com/ClaraCora/lo/main/LocationDetection.js, timeout=10, tag=地理位置查询, img-url=location.circle.system
+generic script-path=https://raw.githubusercontent.com/ClaraCora/lo/main/NodeUnlockDetection.js, timeout=20, tag=节点解锁查询, img-url=play.circle.system
+generic script-path=https://raw.githubusercontent.com/ClaraCora/lo/main/IPQualityDetection.js, timeout=15, tag=IP纯净度查询, img-url=network.badge.shield.half.filled
