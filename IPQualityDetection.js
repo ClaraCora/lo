@@ -54,7 +54,6 @@ function json2info(cnt) {
 
     let nativeText = getNativeText(data);
     let ipTypeText = getIpTypeText(data);
-    let humanBotRatio = getHumanBotRatio(data);
     let fraudScore = safeValue(data.fraudScore);
     let riskLevel = getRiskLevel(data.fraudScore);
 
@@ -69,7 +68,6 @@ function json2info(cnt) {
     lines.push(formatLine("网络属性", ipTypeText));
     lines.push(formatLine("住宅属性", boolText(data.isResidential)));
     lines.push(formatLine("广播属性", boolText(data.isBroadcast)));
-    lines.push(formatLine("ASN人机流量比", humanBotRatio));
     lines.push(formatLine("风险系数", fraudScore));
     lines.push(formatLine("风险评级", riskLevel));
 
@@ -89,7 +87,19 @@ function json2info(cnt) {
 }
 
 function formatLine(name, value) {
-    return `<b>${name}</b> : ${safeValue(value)}`;
+    return `<b>${padLabel(name, 8)}</b> : ${safeValue(value)}`;
+}
+
+function padLabel(name, width) {
+    let len = getDisplayLength(name);
+    if (len >= width) return name;
+    return name + "　".repeat(width - len);
+}
+
+function getDisplayLength(str) {
+    return Array.from(String(str)).reduce((n, ch) => {
+        return n + (/[^\x00-\xff]/.test(ch) ? 2 : 1);
+    }, 0);
 }
 
 function safeValue(v) {
