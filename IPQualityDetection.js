@@ -65,11 +65,11 @@ function json2info(cnt) {
     lines.push(formatLine("时区", safeValue(data.timezone)));
     lines.push(formatLine("ASN", safeValue(data.asn)));
     lines.push(formatLine("ASN所属机构", safeValue(data.asOrganization)));
-    lines.push(formatLine("是否原生IP", nativeText));
-    lines.push(formatLine("IP属性", ipTypeText));
-    lines.push(formatLine("是否住宅IP", boolText(data.isResidential)));
-    lines.push(formatLine("是否广播IP", boolText(data.isBroadcast)));
-    lines.push(formatLine("人机流量比", humanBotRatio));
+    lines.push(formatLine("IP类型", nativeText));
+    lines.push(formatLine("网络属性", ipTypeText));
+    lines.push(formatLine("住宅属性", boolText(data.isResidential)));
+    lines.push(formatLine("广播属性", boolText(data.isBroadcast)));
+    lines.push(formatLine("ASN人机流量比", humanBotRatio));
     lines.push(formatLine("风险系数", fraudScore));
     lines.push(formatLine("风险评级", riskLevel));
     lines.push("------------------------------------");
@@ -113,10 +113,75 @@ function getIpTypeText(data) {
 }
 
 function getHumanBotRatio(data) {
-    if (data.humanBotRatio !== undefined && data.humanBotRatio !== null && data.humanBotRatio !== "") return String(data.humanBotRatio);
-    if (data.humanTrafficRatio !== undefined && data.humanTrafficRatio !== null && data.humanTrafficRatio !== "") return String(data.humanTrafficRatio);
-    if (data.botHumanRatio !== undefined && data.botHumanRatio !== null && data.botHumanRatio !== "") return String(data.botHumanRatio);
-    return "API 未提供";
+    let direct = pickFirstDefined([
+        data.asnHumanBotRatio,
+        data.asn_human_bot_ratio,
+        data.asnHumanTrafficRatio,
+        data.asn_human_traffic_ratio,
+        data.humanBotRatio,
+        data.human_bot_ratio,
+        data.humanTrafficRatio,
+        data.human_traffic_ratio,
+        data.botHumanRatio,
+        data.bot_human_ratio,
+        data.cloudflareHumanRatio,
+        data.cloudflare_human_ratio,
+        data.cloudflareBotScore,
+        data.cloudflare_bot_score,
+        data.botScore,
+        data.bot_score
+    ]);
+
+    if (direct === undefined || direct === null || direct === "") {
+        return "API 未提供";
+    }
+
+    let text = normalizeHumanBotRatio(direct, data);
+    return text || "API 未提供";
+}
+
+function normalizeHumanBotRatio(value, data) {
+    if (typeof value === 'string') {
+        let t = value.trim();
+        if (!t) return "";
+        if (/%|:|人|机|bot|human/i.test(t)) return t;
+        let n = Number(t);
+        if (!isNaN(n)) return formatHumanBotNumber(n, data);
+        return t;
+    }
+
+    if (typeof value === 'number') {
+        return formatHumanBotNumber(value, data);
+    }
+
+    return String(value);
+}
+
+function formatHumanBotNumber(n, data) {
+    if (n >= 0 && n <= 1) {
+        return Math.round(n * 100) + "%";
+    }
+
+    if (n >= 1 && n <= 99) {
+        let hasBotScoreHint = data.cloudflareBotScore !== undefined || data.cloudflare_bot_score !== undefined || data.botScore !== undefined || data.bot_score !== undefined;
+        if (hasBotScoreHint) {
+            return n + "（Bot Score）";
+        }
+        return n + "%";
+    }
+
+    if (n === 100) {
+        return "100%";
+    }
+
+    return String(n);
+}
+
+function pickFirstDefined(arr) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] !== undefined && arr[i] !== null && arr[i] !== "") return arr[i];
+    }
+    return undefined;
 }
 
 function getRiskLevel(score) {
