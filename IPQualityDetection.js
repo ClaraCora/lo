@@ -101,8 +101,8 @@ function boolText(v) {
 }
 
 function getNativeText(data) {
-    if (data.isBroadcast === true) return "否（广播/中转特征）";
-    if (data.isBroadcast === false) return "倾向原生";
+    if (data.isBroadcast === true) return "广播IP";
+    if (data.isBroadcast === false) return "原生IP";
     return "未知";
 }
 

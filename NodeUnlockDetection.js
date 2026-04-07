@@ -6,6 +6,7 @@
  * 2025.6.7  修复ChatGPT检测（禁用308重定向） by dcpengx
  */
 const NF_BASE_URL = "https://www.netflix.com/title/81280792";
+const TIKTOK_BASE_URL = "https://www.tiktok.com/";
 const DISNEY_BASE_URL = 'https://www.disneyplus.com';
 const DISNEY_LOCATION_BASE_URL = 'https://disney.api.edge.bamgrid.com/graph/v1/device/graphql';
 const YTB_BASE_URL = "https://www.youtube.com/premium";
@@ -29,6 +30,7 @@ let result = {
     "title": '  节点解锁查询',
     "YouTube": '<b>YouTube: </b>检测失败，请重试� ❗️',
     "Netflix": '<b>Netflix: </b>检测失败，请重试 ❗️',
+    "TikTok": '<b>TikTok: </b>检测失败，请重试 ❗️',
     "Dazn": "<b>Dazn: </b>检测失败，请重试 ❗️",
     "Disney": "<b>Disneyᐩ: </b>检测失败，请重试 ❗️",
     "Paramount" : "<b>Paramountᐩ: </b>检测失败，请重试 ❗️",
@@ -37,19 +39,89 @@ let result = {
 
 let arrow = " ➟ "
 
-Promise.all([ytbTest(),disneyLocation(),nfTest(),daznTest(),parmTest(),discoveryTest(),gptTest()]).then(value => {
-    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
+Promise.all([ytbTest(),tiktokTest(),disneyLocation(),nfTest(),daznTest(),parmTest(),discoveryTest(),gptTest()]).then(value => {
+    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["TikTok"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
     content = content + "</br>------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + nodeName+ "</font>"
     content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
     console.log(content);
     $done({"title":result["title"],"htmlMessage":content})
 }).catch (values => {
     console.log("reject:" + values);
-    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
+    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["TikTok"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
     content = content + "</br>------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + nodeName+ "</font>"
     content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
     $done({"title":result["title"],"htmlMessage":content})
 })
+
+function tiktokTest() {
+    return new Promise((resolve, reject) => {
+        let params = {
+            url: TIKTOK_BASE_URL,
+            node: nodeName,
+            timeout: 8000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+                'Accept-Language': 'en-US,en;q=0.9'
+            }
+        }
+        $httpClient.get(params, (errormsg, response, data) => {
+            console.log("----------TikTok--------------");
+            if (errormsg) {
+                console.log("TikTok request failed:" + errormsg);
+                result["TikTok"] = "<b>TikTok: </b>检测失败 ❗️";
+                resolve(errormsg);
+                return;
+            }
+            if (!response) {
+                result["TikTok"] = "<b>TikTok: </b>检测失败 ❗️";
+                resolve("no response");
+                return;
+            }
+            if (response.status == 403) {
+                result["TikTok"] = "<b>TikTok: </b>未支持 🚫";
+                resolve("403 forbidden");
+                return;
+            }
+            if (response.status != 200) {
+                result["TikTok"] = "<b>TikTok: </b>检测失败 ❗️";
+                resolve(response.status);
+                return;
+            }
+
+            let region = '';
+            let m = null;
+
+            m = data.match(/"region":"([A-Z]{2})"/i)
+             || data.match(/"geo_country_code":"([A-Z]{2})"/i)
+             || data.match(/"appRegion":"([A-Z]{2})"/i)
+             || data.match(/"countryCode":"([A-Z]{2})"/i)
+             || data.match(/"$region":"([A-Z]{2})"/i);
+
+            if (/unavailable|not available in your region|region is not supported|currently unavailable/i.test(data)) {
+                result["TikTok"] = "<b>TikTok: </b>未支持 🚫";
+                resolve("region blocked");
+                return;
+            }
+
+            if (m && m[1]) {
+                region = m[1].toUpperCase();
+                let flag = flags.get(region) ? "⟦" + flags.get(region) + "⟧" : "⟦" + region + "⟧";
+                result["TikTok"] = "<b>TikTok: </b>支持 " + arrow + "" + flag + " 🎉";
+                resolve(region);
+                return;
+            }
+
+            if (/tiktok/i.test(data)) {
+                result["TikTok"] = "<b>TikTok: </b>支持 ⚠️";
+                resolve("supported-unknown-region");
+                return;
+            }
+
+            result["TikTok"] = "<b>TikTok: </b>检测失败 ❗️";
+            resolve("unknown");
+        })
+    })
+}
 
 function disneyLocation() {
     return new Promise((resolve, reject) => {
