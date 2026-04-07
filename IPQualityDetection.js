@@ -60,11 +60,11 @@ function json2info(cnt) {
 
     let lines = [];
     lines.push("------------------------------------");
-    lines.push(formatLine("出口IP地址", safeValue(data.ip)));
+    lines.push(formatLine("出口IP", safeValue(data.ip)));
     lines.push(formatLine("IP地区", joinParts([safeValue(data.country), safeValue(data.region), safeValue(data.city)]) + flag));
     lines.push(formatLine("时区", safeValue(data.timezone)));
     lines.push(formatLine("ASN", safeValue(data.asn)));
-    lines.push(formatLine("ASN所属机构", safeValue(data.asOrganization)));
+    lines.push(formatLine("ASN机构", safeValue(data.asOrganization)));
     lines.push(formatLine("IP类型", nativeText));
     lines.push(formatLine("网络属性", ipTypeText));
     lines.push(formatLine("住宅属性", boolText(data.isResidential)));
@@ -72,6 +72,14 @@ function json2info(cnt) {
     lines.push(formatLine("ASN人机流量比", humanBotRatio));
     lines.push(formatLine("风险系数", fraudScore));
     lines.push(formatLine("风险评级", riskLevel));
+
+    let extraLines = buildExtraLines(data);
+    if (extraLines.length > 0) {
+        lines.push("------------------------------------");
+        lines.push("<b>原始字段</b>");
+        lines = lines.concat(extraLines);
+    }
+
     lines.push("------------------------------------");
     lines.push(`<font color=#6959CD><b>节点</b> ➟ ${nodeName}</font>`);
 
@@ -110,6 +118,41 @@ function getIpTypeText(data) {
     if (data.isResidential === true) return "住宅IP";
     if (data.isResidential === false) return "机房IP";
     return "未知";
+}
+
+function buildExtraLines(data) {
+    let knownKeys = {
+        ip: true,
+        country: true,
+        countryCode: true,
+        region: true,
+        city: true,
+        timezone: true,
+        asn: true,
+        asOrganization: true,
+        isResidential: true,
+        isBroadcast: true,
+        fraudScore: true
+    };
+
+    let lines = [];
+    Object.keys(data).sort().forEach(key => {
+        if (knownKeys[key]) return;
+        lines.push(formatLine(key, formatRawValue(data[key])));
+    });
+    return lines;
+}
+
+function formatRawValue(v) {
+    if (v === undefined || v === null || v === "") return "-";
+    if (typeof v === 'object') {
+        try {
+            return JSON.stringify(v);
+        } catch (e) {
+            return String(v);
+        }
+    }
+    return String(v);
 }
 
 function getHumanBotRatio(data) {
