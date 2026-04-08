@@ -17,6 +17,7 @@ const Discovery_BASE_URL = "https://us1-prod-direct.discoveryplus.com/users/me"
 
 const GPT_BASE_URL = 'https://chat.openai.com/'
 const GPT_RegionL_URL = 'https://chat.openai.com/cdn-cgi/trace'
+const GEMINI_BASE_URL = 'https://gemini.google.com/'
 
 const Google_BASE_URL = 'https://www.google.com/maps/timeline'
 
@@ -33,19 +34,20 @@ let result = {
     "Disney": "<b>Disneyᐩ: </b>检测失败，请重试 ❗️",
     "Paramount" : "<b>Paramountᐩ: </b>检测失败，请重试 ❗️",
     "Discovery" : "<b>Discoveryᐩ: </b>检测失败，请重试 ❗️",
+    "Gemini": "<b>Gemini: </b>检测失败，请重试 ❗️",
 }
 
 let arrow = " ➟ "
 
-Promise.all([ytbTest(),disneyLocation(),nfTest(),daznTest(),parmTest(),discoveryTest(),gptTest()]).then(value => {
-    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
+Promise.all([ytbTest(),disneyLocation(),nfTest(),daznTest(),parmTest(),discoveryTest(),gptTest(),geminiTest()]).then(value => {
+    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["ChatGPT"],result["Gemini"],result["YouTube"]]).join("</br></br>")
     content = content + "</br>------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + nodeName+ "</font>"
     content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
     console.log(content);
     $done({"title":result["title"],"htmlMessage":content})
 }).catch (values => {
     console.log("reject:" + values);
-    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
+    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["ChatGPT"],result["Gemini"],result["YouTube"]]).join("</br></br>")
     content = content + "</br>------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + nodeName+ "</font>"
     content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
     $done({"title":result["title"],"htmlMessage":content})
@@ -403,8 +405,68 @@ function nfTest() {
     })
 }
 
-//chatgpt
+//chatgpt / gemini
 support_countryCodes=["T1","XX","AL","DZ","AD","AO","AG","AR","AM","AU","AT","AZ","BS","BD","BB","BE","BZ","BJ","BT","BA","BW","BR","BG","BF","CV","CA","CL","CO","KM","CR","HR","CY","DK","DJ","DM","DO","EC","SV","EE","FJ","FI","FR","GA","GM","GE","DE","GH","GR","GD","GT","GN","GW","GY","HT","HN","HU","IS","IN","ID","IQ","IE","IL","IT","JM","JP","JO","KZ","KE","KI","KW","KG","LV","LB","LS","LR","LI","LT","LU","MG","MW","MY","MV","ML","MT","MH","MR","MU","MX","MC","MN","ME","MA","MZ","MM","NA","NR","NP","NL","NZ","NI","NE","NG","MK","NO","OM","PK","PW","PA","PG","PE","PH","PL","PT","QA","RO","RW","KN","LC","VC","WS","SM","ST","SN","RS","SC","SL","SG","SK","SI","SB","ZA","ES","LK","SR","SE","CH","TH","TG","TO","TT","TN","TR","TV","UG","AE","US","UY","VU","ZM","BO","BN","CG","CZ","VA","FM","MD","PS","KR","TW","TZ","TL","GB"]
+gemini_support_countryCodes=["AL","DZ","AS","AO","AI","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BE","BZ","BJ","BM","BT","BO","BA","BW","BR","VG","BN","BG","BF","KH","CM","CA","CV","KY","TD","CL","CO","CG","CK","CR","CI","HR","CW","CY","CZ","DK","DJ","DM","DO","EC","EG","SV","GQ","ER","EE","SZ","ET","FK","FO","FJ","FI","FR","PF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GU","GT","GN","GW","GY","HT","HN","HK","HU","IS","IN","ID","IQ","IE","IM","IL","IT","JM","JP","JE","JO","KZ","KE","KI","XK","KW","KG","LA","LV","LB","LS","LR","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MH","MR","MU","MX","FM","MD","MC","MN","ME","MS","MA","MZ","NA","NR","NP","NL","NC","NZ","NI","NE","NG","NU","NF","MP","NO","OM","PK","PW","PS","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RE","RO","RW","BL","SH","KN","LC","MF","PM","VC","WS","SM","ST","SA","SN","RS","SC","SL","SG","SX","SK","SI","SB","ZA","KR","ES","LK","SR","SE","CH","TW","TJ","TZ","TH","TL","TG","TO","TT","TN","TR","TM","TC","TV","UG","UA","AE","US","UY","VI","UZ","VU","VN","ZM","ZW","GB"]
+
+function geminiTest() {
+    return new Promise((resolve, reject) => {
+        let params = {
+            url: GEMINI_BASE_URL,
+            node: nodeName,
+            timeout: 5000,
+            'auto-redirect': false,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+                'Accept-Language': 'en-US,en;q=0.9'
+            }
+        }
+        $httpClient.get(params, (errormsg,response,data) => {
+            console.log("----------Gemini--------------");
+            if (errormsg) {
+                result["Gemini"] = "<b>Gemini: </b>检测失败 ❗️";
+                resolve(errormsg);
+                return;
+            }
+            if (!response) {
+                result["Gemini"] = "<b>Gemini: </b>检测失败 ❗️";
+                resolve("no response");
+                return;
+            }
+            if (response.status == 403 || /not available in your country|not supported in your region|unavailable in your region/i.test(data || "")) {
+                result["Gemini"] = "<b>Gemini: </b>未支持 🚫";
+                resolve("Gemini blocked");
+                return;
+            }
+
+            let p = {
+                url: GPT_RegionL_URL,
+                node: nodeName,
+                timeout: 5000,
+            }
+            $httpClient.get(p, (emsg, resheader, resData) => {
+                if (emsg) {
+                    result["Gemini"] = "<b>Gemini: </b>检测失败 ❗️";
+                    resolve(emsg);
+                    return;
+                }
+                let region = resData.split("loc=")[1]?.split("\n")[0] || "";
+                region = region.toUpperCase();
+                if (!region) {
+                    result["Gemini"] = "<b>Gemini: </b>检测失败 ❗️";
+                    resolve("no region");
+                    return;
+                }
+                if (gemini_support_countryCodes.indexOf(region) !== -1) {
+                    result["Gemini"] = "<b>Gemini: </b>支持 "+arrow+ "⟦"+(flags.get(region) || region)+"⟧ 🎉";
+                } else {
+                    result["Gemini"] = "<b>Gemini: </b>未支持 "+arrow+ "⟦"+(flags.get(region) || region)+"⟧ 🚫";
+                }
+                resolve(region);
+            })
+        })
+    })
+}
 
 function gptTest() {
     return new Promise((resolve, reject) => {
