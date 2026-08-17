@@ -445,18 +445,19 @@ function nfTest() {
                 result["Netflix"] = "<b>Netflix: </b>支持自制剧集 ⚠️"
                 resolve("404 Not Found");
             } else if (response.status == 200) {
-                console.log("NF request result:" + JSON.stringify(response.headers));
-                let ourl = response.headers['X-Originating-URL']
+                const headers = response.headers || {}
+                console.log("NF request result:" + JSON.stringify(headers));
+                let ourl = headers['X-Originating-URL']
                 if (ourl == undefined) {
-                    ourl = response.headers['X-Originating-Url']
+                    ourl = headers['X-Originating-Url']
                 }
                 if (ourl == undefined) {
-                    ourl = response.headers['x-originating-url']
+                    ourl = headers['x-originating-url']
                 }
                 if (ourl == undefined) {
                     console.log("未知地区")
                     result["Netflix"] = "<b>Netflix: </b>完整支持"+arrow+ "⟦未知地区⟧ 🎉"
-                    resolve(region);
+                    resolve("unknown region");
                 } else {
                     console.log("X-Originating-URL:" + ourl)
                     let region = ourl.split('/')[3]
