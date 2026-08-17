@@ -58,7 +58,7 @@ function tiktokTest() {
         let params = {
             url: TIKTOK_BASE_URL,
             node: nodeName,
-            timeout: 8000,
+            timeout: 12000,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
                 'Accept-Language': 'en-US,en;q=0.9'
@@ -128,7 +128,7 @@ function disneyLocation() {
         let params = {
             url: DISNEY_LOCATION_BASE_URL,
             node: nodeName,
-            timeout: 5000, //ms
+            timeout: 10000, //ms
             headers: {
                 'Accept-Language': 'en',
                 "Authorization": 'ZGlzbmV5JmJyb3dzZXImMS4wLjA.Cu56AgSfBTDag5NiRA81oLHkDZfu5L3CKadnefEAY84',
@@ -195,7 +195,7 @@ function disneyHomePage() {
         let params = {
             url: DISNEY_BASE_URL,
             node: nodeName,
-            timeout: 5000, //ms
+            timeout: 10000, //ms
             headers: {
                 'Accept-Language': 'en',
                 'User-Agent': UA,
@@ -228,7 +228,7 @@ function ytbTest() {
         let params = {
             url: YTB_BASE_URL,
             node: nodeName,
-            timeout: 10000, //ms
+            timeout: 12000, //ms
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
             }
@@ -285,7 +285,7 @@ function daznTest() {
         let params = {
             url: Dazn_BASE_URL,
             node: nodeName,
-            timeout: 5000, //ms
+            timeout: 10000, //ms
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
                 "Content-Type": "application/json"
@@ -326,7 +326,7 @@ function parmTest() {
         let params = {
             url: Param_BASE_URL,
             node: nodeName,
-            timeout: 5000, //ms
+            timeout: 10000, //ms
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
             }
@@ -359,7 +359,7 @@ function discoveryTest() {
         let params = {
             url: Discovery_token_BASE_URL,
             node: nodeName,
-            timeout: 5000, //ms
+            timeout: 10000, //ms
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
             }
@@ -380,7 +380,7 @@ function discoveryTest() {
                 let p = {
                     url: Discovery_BASE_URL,
                     node: nodeName,
-                    timeout: 5000,
+                    timeout: 10000,
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
                         "Cookie": cookievalid,
@@ -424,7 +424,7 @@ function nfTest() {
         let params = {
             url: NF_BASE_URL,
             node: nodeName,
-            timeout: 6000, //ms
+            timeout: 12000, //ms
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15',
             }
@@ -483,7 +483,7 @@ function gptTest() {
         let params = {
             url: GPT_BASE_URL,
             node: nodeName,
-            timeout: 5000, //ms
+            timeout: 10000, //ms
             'auto-redirect':false,   //  关闭自动重定向
         }
         $httpClient.get(params, (errormsg,response,data) => {
@@ -502,7 +502,7 @@ function gptTest() {
                 let p = {
                     url: GPT_RegionL_URL,
                     node: nodeName,
-                    timeout: 5000, //ms
+                    timeout: 10000, //ms
                 }
                 $httpClient.get(p, (emsg, resheader, resData) => {
                     console.log("----------GPT RegionL--------------");

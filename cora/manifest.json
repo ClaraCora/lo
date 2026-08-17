@@ -4,9 +4,9 @@
     {
       "id": "node-unlock-detection",
       "name": "节点解锁检测",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "scriptURL": "https://raw.githubusercontent.com/ClaraCora/lo/main/cora/NodeUnlockDetection.js",
-      "sha256": "91099411d3bc2f538b7a2083526537caafc0e350ab5a73f5aa40a6954c4c96d5",
+      "sha256": "0b6e842a81ea3ebebe560cb06dcc3f41c60951274942195387c6948607182977",
       "requiredCapabilities": ["node-http", "done-html"]
     }
   ]
