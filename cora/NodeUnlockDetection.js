@@ -40,18 +40,28 @@ let result = {
 let arrow = " ➟ "
 
 Promise.all([ytbTest(),tiktokTest(),disneyLocation(),nfTest(),daznTest(),parmTest(),discoveryTest(),gptTest()]).then(value => {
-    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["TikTok"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
-    content = content + "</br>------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + nodeName+ "</font>"
-    content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
+    const content = buildResultMessage();
     console.log(content);
     $done({"title":result["title"],"htmlMessage":content})
 }).catch (values => {
     console.log("reject:" + values);
-    let content = "------------------------------------</br>"+([result["Dazn"],result["Discovery"],result["Paramount"],result["Disney"],result["Netflix"],result["TikTok"],result["ChatGPT"],result["YouTube"]]).join("</br></br>")
-    content = content + "</br>------------------------------------</br>"+"<font color=#CD5C5C>"+"<b>节点</b> ➟ " + nodeName+ "</font>"
-    content =`<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">` + content + `</p>`
-    $done({"title":result["title"],"htmlMessage":content})
+    $done({"title":result["title"],"htmlMessage":buildResultMessage()})
 })
+
+function buildResultMessage() {
+    const lines = [
+        result["Dazn"],
+        result["Discovery"],
+        result["Paramount"],
+        result["Disney"],
+        result["Netflix"],
+        result["TikTok"],
+        result["ChatGPT"],
+        result["YouTube"],
+        "<font color=#CD5C5C><b>节点</b> ➟ " + nodeName + "</font>"
+    ];
+    return `<p style="text-align: center; font-family: -apple-system; font-size: large; font-weight: thin">${lines.join("<br>")}</p>`;
+}
 
 function tiktokTest() {
     return new Promise((resolve, reject) => {
@@ -77,31 +87,30 @@ function tiktokTest() {
                 resolve("no response");
                 return;
             }
-            if (response.status == 403) {
-                result["TikTok"] = "<b>TikTok: </b>未支持 🚫";
-                resolve("403 forbidden");
+            const status = response.status || response.statusCode;
+            if (status == 403) {
+                result["TikTok"] = "<b>TikTok: </b>检测受限（无法判断）⚠️";
+                resolve("403 detection restricted");
                 return;
             }
-            if (response.status != 200) {
+            if (status != 200) {
                 result["TikTok"] = "<b>TikTok: </b>检测失败 ❗️";
-                resolve(response.status);
+                resolve(status);
                 return;
             }
 
+            data = typeof data === "string" ? data : "";
             let region = '';
             let m = null;
 
-            m = data.match(/"region":"([A-Z]{2})"/i)
-             || data.match(/"geo_country_code":"([A-Z]{2})"/i)
-             || data.match(/"appRegion":"([A-Z]{2})"/i)
-             || data.match(/"countryCode":"([A-Z]{2})"/i)
-             || data.match(/"$region":"([A-Z]{2})"/i);
-
-            if (/unavailable|not available in your region|region is not supported|currently unavailable/i.test(data)) {
-                result["TikTok"] = "<b>TikTok: </b>未支持 🚫";
-                resolve("region blocked");
-                return;
-            }
+            m = data.match(/"region"\s*:\s*"([A-Z]{2})"/i)
+             || data.match(/\\"region\\"\s*:\s*\\"([A-Z]{2})\\"/i)
+             || data.match(/"geo_country_code"\s*:\s*"([A-Z]{2})"/i)
+             || data.match(/"appRegion"\s*:\s*"([A-Z]{2})"/i)
+             || data.match(/"countryCode"\s*:\s*"([A-Z]{2})"/i)
+             || data.match(/"regionCode"\s*:\s*"([A-Z]{2})"/i)
+             || data.match(/"$region"\s*:\s*"([A-Z]{2})"/i)
+             || data.match(/data-region=["']([A-Z]{2})["']/i);
 
             if (m && m[1]) {
                 region = m[1].toUpperCase();
@@ -111,8 +120,16 @@ function tiktokTest() {
                 return;
             }
 
+            // Only explicit geographic blocking copy proves that the service is unavailable.
+            // Generic "unavailable" text also occurs in normal TikTok page resources.
+            if (/tiktok(?:\s+is)?\s+not available in (?:your )?(?:country|region)|tiktok(?:\s+is)?n['’]t available in (?:your )?(?:country|region)|this service is not available in (?:your )?(?:country|region)|region is not supported/i.test(data)) {
+                result["TikTok"] = "<b>TikTok: </b>未支持 🚫";
+                resolve("region blocked");
+                return;
+            }
+
             if (/tiktok/i.test(data)) {
-                result["TikTok"] = "<b>TikTok: </b>支持 ⚠️";
+                result["TikTok"] = "<b>TikTok: </b>支持 ➟ ⟦地区未知⟧ 🎉";
                 resolve("supported-unknown-region");
                 return;
             }
