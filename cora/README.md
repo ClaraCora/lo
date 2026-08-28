@@ -5,10 +5,10 @@
 ## 当前脚本
 
 - `NodeUnlockDetection.js`：流媒体与 AI 服务可用性检测。
-- `NetworkEntryAndExitQueries.js`：显示本次测试节点，并通过出口 IP 接口确认出口地址、位置和 ASN。
+- `NetworkEntryAndExitQueries.js`：显示本机公网 IP、节点入口 IP、入口归属及出口信息。只有本机公网查询由 NE 内置的固定 DIRECT 接口执行；脚本的其他 HTTP 请求仍经过所选节点。
 - `IPQualityDetection.js`：查询出口 IP 的网络属性、住宅/机房、广播和风险信息。
 
-脚本输出按检测项目逐行返回，只保留必要字段，避免把完整 API 响应带入 Network Extension。新增脚本时，除了更新清单，还应在节点长按菜单中确认脚本名称和 SF Symbol 图标正确显示。
+脚本输出按检测项目逐行返回，只保留必要字段，避免把完整 API 响应带入 Network Extension。新增脚本时，除了更新清单，还应在节点长按菜单中确认脚本名称和 SF Symbol 图标正确显示。`direct-network-info` 是受限能力：它不允许脚本直接发起请求，只允许读取 NE 通过固定公网接口得到的本机网络摘要。
 
 ## 运行时约定
 

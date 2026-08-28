@@ -13,10 +13,10 @@
     {
       "id": "network-entry-exit",
       "name": "入口/出口查询",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "scriptURL": "https://raw.githubusercontent.com/ClaraCora/lo/main/cora/NetworkEntryAndExitQueries.js",
-      "sha256": "251683a3a75fa853da494da3655610972fe5e7eccfda2005b3b218e095a26ac8",
-      "requiredCapabilities": ["node-http", "done-html"],
+      "sha256": "ebd2a8cd9ed26c99cf47bd2332f4d55fdc367deb265320cb8ff74ca4f64e4f9e",
+      "requiredCapabilities": ["node-http", "direct-network-info", "done-html"],
       "icon": "arrow.left.arrow.right"
     },
     {

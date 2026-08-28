@@ -1,13 +1,15 @@
 /*
  * Cora 网络入口/出口查询
  *
- * 参考 Loon NetworkEntryAndExitQueries.js 的展示目标，改为 Cora 的
- * node-http 运行时契约。Cora 只能安全地通过所选节点发起 HTTPS 请求，
- * 因此“入口”显示为本次使用的节点标识，“出口”使用 IP 地理接口确认。
+ * 本机公网信息由 Cora NE 的 DIRECT 出站在运行前采集；节点入口地址由
+ * mihomo 当前实际选中的代理提供。脚本本身只经所选节点查询入口/出口归属。
  */
 
-var nodeName = ($environment && $environment.params && $environment.params.node) || "当前节点";
-var endpoints = [
+var params = ($environment && $environment.params) || {};
+var nodeName = params.node || "当前节点";
+var nodeInfo = params.nodeInfo || {};
+var directNetworkInfo = params.directNetworkInfo || {};
+var exitEndpoints = [
     "https://ipwho.is/",
     "https://api.ip.sb/geoip"
 ];
@@ -23,12 +25,8 @@ function request(url) {
                 "Accept": "application/json"
             }
         }, function (error, response, body) {
-            if (error || !response) {
-                resolve(null);
-                return;
-            }
-            var status = response.status || response.statusCode;
-            if (status < 200 || status >= 300 || !body) {
+            var status = response && (response.status || response.statusCode);
+            if (error || !response || status < 200 || status >= 300 || !body) {
                 resolve(null);
                 return;
             }
@@ -50,33 +48,53 @@ function firstValue(values) {
     return "-";
 }
 
+function nonEmpty(values) {
+    return values.filter(function (value) { return value && value !== "-"; });
+}
+
 function parseInfo(data) {
     if (!data || data.success === false) return null;
     var connection = data.connection || {};
-    var country = firstValue([data.country, data.country_name]);
+    var country = firstValue([data.country, data.country_name, data.countryCode]);
     var region = firstValue([data.region, data.regionName]);
     var city = firstValue([data.city]);
-    var location = [country, region, city].filter(function (value) { return value !== "-"; }).join(" / ") || "-";
+    var location = nonEmpty([country, region, city]).join(" / ") || "-";
     var ip = firstValue([data.ip, data.query]);
     if (ip === "-") return null;
     return {
         ip: ip,
         location: location,
         asn: firstValue([data.asn, connection.asn]),
-        organization: firstValue([data.asOrganization, data.organization, data.org, connection.org]),
+        organization: firstValue([data.asOrganization, data.organization, data.asn_organization, data.org, connection.org]),
         isp: firstValue([data.isp, connection.isp])
     };
 }
 
-function finish(info, sourceCount) {
+function directValue(key) {
+    var value = directNetworkInfo[key];
+    return value === undefined || value === null || String(value).trim() === "" ? "-" : String(value);
+}
+
+function finish(exitInfo, entranceInfo, exitSourceCount) {
+    var entranceAddress = firstValue([nodeInfo.address, nodeInfo.host]);
+    var entranceIP = firstValue([nodeInfo.ip]);
     var lines = [
+        "本机公网 IP：" + directValue("ip"),
+        "本机归属地：" + directValue("location"),
+        "本机 ASN：" + directValue("asn"),
+        "本机网络组织：" + directValue("organization"),
         "入口节点：" + nodeName,
-        "出口 IP：" + (info ? info.ip : "查询失败"),
-        "出口位置：" + (info ? info.location : "-"),
-        "ASN：" + (info ? info.asn : "-"),
-        "网络组织：" + (info ? info.organization : "-"),
-        "运营商：" + (info ? info.isp : "-"),
-        info ? "数据校验：已从 " + sourceCount + " 个接口取得结果" : "状态：检测失败（接口无响应或返回格式异常）"
+        "节点入口：" + entranceAddress,
+        "入口 IP：" + entranceIP,
+        "入口归属地：" + (entranceInfo ? entranceInfo.location : "-"),
+        "入口 ASN：" + (entranceInfo ? entranceInfo.asn : "-"),
+        "入口网络组织：" + (entranceInfo ? entranceInfo.organization : "-"),
+        "出口 IP：" + (exitInfo ? exitInfo.ip : "查询失败"),
+        "出口归属地：" + (exitInfo ? exitInfo.location : "-"),
+        "出口 ASN：" + (exitInfo ? exitInfo.asn : "-"),
+        "出口网络组织：" + (exitInfo ? exitInfo.organization : "-"),
+        "出口运营商：" + (exitInfo ? exitInfo.isp : "-"),
+        exitInfo ? "出口数据校验：" + exitSourceCount + " 个接口可用" : "出口状态：检测失败（接口无响应或返回格式异常）"
     ];
     $done({
         title: "网络入口/出口查询",
@@ -84,9 +102,17 @@ function finish(info, sourceCount) {
     });
 }
 
-Promise.all(endpoints.map(request)).then(function (responses) {
-    var parsed = responses.map(parseInfo).filter(function (value) { return value !== null; });
-    finish(parsed[0] || null, parsed.length);
+var entranceIP = firstValue([nodeInfo.ip]);
+var entranceRequest = entranceIP === "-"
+    ? Promise.resolve(null)
+    : request("https://ipwho.is/" + encodeURIComponent(entranceIP));
+
+Promise.all([
+    Promise.all(exitEndpoints.map(request)),
+    entranceRequest
+]).then(function (responses) {
+    var exits = responses[0].map(parseInfo).filter(function (value) { return value !== null; });
+    finish(exits[0] || null, parseInfo(responses[1]), exits.length);
 }).catch(function (_) {
-    finish(null, 0);
+    finish(null, null, 0);
 });
