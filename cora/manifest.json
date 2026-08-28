@@ -7,7 +7,26 @@
       "version": "1.1.2",
       "scriptURL": "https://raw.githubusercontent.com/ClaraCora/lo/main/cora/NodeUnlockDetection.js",
       "sha256": "b4668094015e8b30061abeff62c2106e1349dabbcf90042f3376e08224c16025",
-      "requiredCapabilities": ["node-http", "done-html"]
+      "requiredCapabilities": ["node-http", "done-html"],
+      "icon": "play.tv"
+    },
+    {
+      "id": "network-entry-exit",
+      "name": "入口/出口查询",
+      "version": "1.0.0",
+      "scriptURL": "https://raw.githubusercontent.com/ClaraCora/lo/main/cora/NetworkEntryAndExitQueries.js",
+      "sha256": "251683a3a75fa853da494da3655610972fe5e7eccfda2005b3b218e095a26ac8",
+      "requiredCapabilities": ["node-http", "done-html"],
+      "icon": "arrow.left.arrow.right"
+    },
+    {
+      "id": "ip-quality-detection",
+      "name": "IP 质量检测",
+      "version": "1.0.0",
+      "scriptURL": "https://raw.githubusercontent.com/ClaraCora/lo/main/cora/IPQualityDetection.js",
+      "sha256": "7ac17bbf55bde01ddfc07e342d0d94665c6e909206d7f4a48a90373791f8c9bc",
+      "requiredCapabilities": ["node-http", "done-html"],
+      "icon": "checkmark.shield"
     }
   ]
 }

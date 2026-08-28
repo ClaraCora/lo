@@ -2,6 +2,14 @@
 
 这里维护 Cora 使用的外部 JavaScript 检测脚本。脚本不会编译进 Cora App，App 启动或手动更新时读取 `manifest.json`，校验脚本摘要后缓存最后一个可用版本。
 
+## 当前脚本
+
+- `NodeUnlockDetection.js`：流媒体与 AI 服务可用性检测。
+- `NetworkEntryAndExitQueries.js`：显示本次测试节点，并通过出口 IP 接口确认出口地址、位置和 ASN。
+- `IPQualityDetection.js`：查询出口 IP 的网络属性、住宅/机房、广播和风险信息。
+
+脚本输出按检测项目逐行返回，只保留必要字段，避免把完整 API 响应带入 Network Extension。新增脚本时，除了更新清单，还应在节点长按菜单中确认脚本名称和 SF Symbol 图标正确显示。
+
 ## 运行时约定
 
 当前脚本使用与 Loon 兼容的最小 API：
@@ -16,7 +24,7 @@
 ## 更新流程
 
 1. 修改脚本并更新 `manifest.json` 中的版本和 SHA-256。
-2. 在 Cora 中通过签名 manifest 发布更新。
+2. 对 manifest 原始 UTF-8 字节重新签名并更新 `manifest.sig`。
 3. Cora 设置页的“检测脚本”中可以手动检查并更新脚本。
 4. App 只有在摘要和签名都通过后才替换本地脚本缓存，下载失败会继续使用上一个版本。
 
