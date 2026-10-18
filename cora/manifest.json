@@ -22,9 +22,9 @@
     {
       "id": "ip-quality-detection",
       "name": "IP 质量检测",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "scriptURL": "https://raw.githubusercontent.com/ClaraCora/lo/main/cora/IPQualityDetection.js",
-      "sha256": "7ac17bbf55bde01ddfc07e342d0d94665c6e909206d7f4a48a90373791f8c9bc",
+      "sha256": "a1b4eb1726e62c622b1805329479afab98481ced0379ca58863b559c21050ef1",
       "requiredCapabilities": ["node-http", "done-html"],
       "icon": "checkmark.shield"
     }

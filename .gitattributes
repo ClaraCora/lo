@@ -1,0 +1,5 @@
+# Cora verifies script hashes and the manifest signature against exact UTF-8 bytes.
+IPQualityDetection.js text eol=lf
+cora/*.js text eol=lf
+cora/manifest.json text eol=lf
+cora/manifest.sig text eol=lf
